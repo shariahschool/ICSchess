@@ -4,9 +4,10 @@ import javax.swing.*;
 public class Chess{
     static JFrame board = new JFrame("Chess");
     static Square[] visualBoard = new Square[64];
-    static Piece[] internalBoard = new Piece[64];
+    static Piece[] internalBoard = new Piece[32];
+    
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
 
         JPanel visuals = new JPanel();
         visuals.setBackground(Color.gray);
@@ -21,6 +22,7 @@ public class Chess{
         }
 
         for (Square i : visualBoard){
+            i.add(new Piece(0, 0, Piece.PAWN, false));
             visuals.add(i);
             visuals.revalidate();
             visuals.repaint();
