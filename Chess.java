@@ -15,7 +15,7 @@ public class Chess{
 
             for(int file = 0; file<8; file++){
                 System.out.println(""+(rank*8+file));
-                visualBoard[rank*8+file] = new Square(file,rank,true);
+                visualBoard[rank*8+file] = new Square(file,rank,(rank+file)%2==0);
             }
 
         }
