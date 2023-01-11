@@ -11,6 +11,9 @@ public class Square extends JPanel {
     public Square(int x, int y, boolean white){
         super();
         this.setPreferredSize(new Dimension(100,100));
+        this.setLayout(new GridBagLayout());
+        this.setAlignmentX(Component.CENTER_ALIGNMENT);
+        this.setAlignmentY(Component.CENTER_ALIGNMENT);
         setRank(x);
         setFile(y);
         setWhite(white);

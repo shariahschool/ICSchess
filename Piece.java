@@ -14,13 +14,27 @@ public class Piece extends JPanel{
     public static final int BISHOP = 4;
     public static final int ROOK = 5;
     public static final int QUEEN = 9;
+    static BufferedImage SHEET;
+    static BufferedImage PAWN_IMAGE;
 
-    static final BufferedImage PAWN_IMAGE = ImageIO.read(new File("Piece-Sprites/p.png"));
+    static{
+        try {
+            SHEET = ImageIO.read(new File("Sprites.png"));
+            PAWN_IMAGE = SHEET.getSubimage(0, 0, 90, 90);
+        } catch (java.io.IOException e) {
+            System.out.print("didn't load");
+        }
+    }
+
+    
+    
 
 
 
     public Piece(int file, int rank, int piece, boolean color){
         super();
+        this.setSize(90,90);
+        this.setOpaque(false);
         this.setFile(file);
         this.setRank(rank);
         this.setPiece(piece);

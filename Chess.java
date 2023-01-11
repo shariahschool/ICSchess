@@ -7,7 +7,7 @@ public class Chess{
     static Piece[] internalBoard = new Piece[32];
     
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
 
         JPanel visuals = new JPanel();
         visuals.setBackground(Color.gray);
@@ -22,7 +22,11 @@ public class Chess{
         }
 
         for (Square i : visualBoard){
-            i.add(new Piece(0, 0, Piece.PAWN, false));
+            GridBagConstraints g = new GridBagConstraints();
+            g.weightx = 1.0;
+            g.weighty = 1.0;
+            g.fill = GridBagConstraints.BOTH;
+            i.add(new Piece(0, 0, Piece.PAWN, false),g);
             visuals.add(i);
             visuals.revalidate();
             visuals.repaint();
@@ -32,6 +36,7 @@ public class Chess{
         visuals.setLayout(new GridLayout(8,8));
 
         board.setSize(800, 800);
+        board.setMaximumSize(new Dimension(90,90));
         board.add(visuals);
         board.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         board.pack();
