@@ -4,7 +4,7 @@ import javax.swing.*;
 public class Chess{
     static JFrame board = new JFrame("Chess");
     static Square[] visualBoard = new Square[64];
-    static Piece[] internalBoard = new Piece[32];
+    static Piece[] internalBoard = new Piece[64];
     
 
     public static void main(String[] args) {
