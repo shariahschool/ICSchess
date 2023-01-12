@@ -22,11 +22,12 @@ public class Chess{
         }
 
         for (Square i : visualBoard){
+            Piece temp = new Piece(0, 0, Piece.PAWN, false);
             GridBagConstraints g = new GridBagConstraints();
+            g.fill = GridBagConstraints.BOTH;
             g.weightx = 1.0;
             g.weighty = 1.0;
-            g.fill = GridBagConstraints.BOTH;
-            i.add(new Piece(0, 0, Piece.PAWN, false),g);
+            i.add(temp,g);
             visuals.add(i);
             visuals.revalidate();
             visuals.repaint();
