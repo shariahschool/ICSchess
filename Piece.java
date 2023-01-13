@@ -1,15 +1,14 @@
 import java.awt.image.BufferedImage;
 import java.awt.*;
-import java.awt.event.MouseListener;
 import javax.swing.*;
 import javax.swing.event.MouseInputListener;
 import java.awt.event.MouseEvent;
 import javax.imageio.ImageIO;
 import java.io.File;
-public class Piece extends JPanel{
+import java.util.ArrayList;
+public class Piece extends JPanel implements MouseInputListener{
     private boolean isWhite;
-    private int file;
-    private int rank;
+    private int index;
     private int piece;
 
     public static final int NONE = 0;
@@ -19,20 +18,11 @@ public class Piece extends JPanel{
     public static final int ROOK = 5;
     public static final int QUEEN = 9;
     public static final int KING = 10;
+
+
     static BufferedImage SHEET;
     static BufferedImage PAWN_WHITE, PAWN_BLACK, KNIGHT_WHITE, KNIGHT_BLACK, BISHOP_WHITE, BISHOP_BLACK, ROOK_WHITE, ROOK_BLACK, QUEEN_WHITE, QUEEN_BLACK, KING_WHITE, KING_BLACK;
-    private MouseListener eveListener = new MouseInputListener() {
-        public void mouseClicked(MouseEvent e) {
-            System.out.println("Click detected");
-        };
-        public void mouseDragged(MouseEvent e) {};
-        public void mouseEntered(MouseEvent e) {};
-        public void mouseExited(MouseEvent e) {};
-        public void mouseMoved(MouseEvent e) {};
-        public void mousePressed(MouseEvent e) {};
-        public void mouseReleased(MouseEvent e) {};
 
-    };
 
     static{
         try {
@@ -44,9 +34,9 @@ public class Piece extends JPanel{
             BISHOP_WHITE = SHEET.getSubimage(180, 0, 90, 90);
             BISHOP_BLACK = SHEET.getSubimage(180, 90, 90, 90);
             ROOK_WHITE = SHEET.getSubimage(360, 0, 90, 90);
-            ROOK_WHITE = SHEET.getSubimage(360, 90, 90, 90);
+            ROOK_BLACK = SHEET.getSubimage(360, 90, 90, 90);
             QUEEN_WHITE = SHEET.getSubimage(90, 0, 90, 90);
-            QUEEN_WHITE = SHEET.getSubimage(90, 90, 90, 90);
+            QUEEN_BLACK = SHEET.getSubimage(90, 90, 90, 90);
             KING_WHITE = SHEET.getSubimage(0, 0, 90, 90);
             KING_BLACK = SHEET.getSubimage(0, 90, 90, 90);
         } catch (java.io.IOException e) {
@@ -59,15 +49,16 @@ public class Piece extends JPanel{
 
 
 
-    public Piece(int file, int rank, int piece, boolean color){
+    public Piece(int index, int piece, boolean color){
         super();
         this.setSize(90,90);
         this.setOpaque(false);
-        this.setFile(file);
-        this.setRank(rank);
         this.setPiece(piece);
         this.setWhite(color);
-        this.addMouseListener(eveListener);
+        this.setIndex(index);
+        addMouseListener(this);
+        addMouseMotionListener(this);
+        
     }
 
     @Override
@@ -108,13 +99,7 @@ public class Piece extends JPanel{
         }
     }
 
-    public void setFile(int file) {
-        this.file = file;
-    }
 
-    public void setRank(int rank) {
-        this.rank = rank;
-    }
     
     public void setPiece(int piece) {
         this.piece = piece;
@@ -128,15 +113,94 @@ public class Piece extends JPanel{
         return piece;
     }
 
-    public int getRank() {
-        return rank;
+    public void setIndex(int index){
+        this.index = index;
     }
 
-    public int getFile() {
-        return file;
+    public int getIndex(){
+        return this.index;
     }
 
     public boolean getIsWhite() {
         return this.isWhite;
     }
+
+
+    public ArrayList<Integer> generatePawnMoves(){
+        boolean starting = false;
+        ArrayList<Integer> moves = new ArrayList<Integer>();
+        if(this.isWhite){
+            starting = index>47&&index<56;
+
+            if(this.index-8>=0&&Chess.internalBoard.get(index-8).getPiece() == NONE){
+                moves.add(index-8);
+            }
+            if(starting && this.index-16>=0&&Chess.internalBoard.get(index-16).getPiece() == NONE){
+                moves.add(index-16);
+            }
+            if(this.index-9>=0&&Chess.internalBoard.get(index-9).getPiece() != NONE && Chess.internalBoard.get(index-7).getIsWhite() != this.isWhite){
+                moves.add(index-9);
+            }
+            if(this.index-7>=0&&Chess.internalBoard.get(index-7).getPiece() != NONE && Chess.internalBoard.get(index-7).getIsWhite() != this.isWhite){
+                moves.add(index-7);
+            }
+        }else{
+            starting = index>7&&index<16;
+
+            if(this.index+8<=63&&Chess.internalBoard.get(index+8).getPiece() == NONE){
+                moves.add(index+8);
+            }
+            if(starting && this.index+16<=63&&Chess.internalBoard.get(index+16).getPiece() == NONE){
+                moves.add(index+16);
+            }
+            if(this.index+9<=63&&Chess.internalBoard.get(index+9).getPiece() != NONE && Chess.internalBoard.get(index-7).getIsWhite() != this.isWhite){
+                moves.add(index+9);
+            }
+            if(this.index+7<=63&&Chess.internalBoard.get(index+7).getPiece() != NONE && Chess.internalBoard.get(index-7).getIsWhite() != this.isWhite){
+                moves.add(index+7);
+            }
+        }
+ 
+        return moves;
+
+    }
+
+
+    public void mouseClicked(MouseEvent e) {
+        System.out.println(this.index);
+        GridBagConstraints g = new GridBagConstraints();
+        for(int h : Chess.hilited){
+            Chess.visualBoard.get(h).setBackground(Chess.visualBoard.get(h).isWhite()?Color.decode("#ECB069"):Color.decode("#763C2C"));
+        }
+        Chess.hilited.clear();
+        g.weightx = 1.0;
+        g.weighty = 1.0;
+        g.fill = GridBagConstraints.BOTH;
+        switch(this.piece){
+            case NONE:
+                break;
+            case PAWN:
+                for(int index : generatePawnMoves()){
+                    Chess.visualBoard.get(index).setBackground(Color.decode("#F88379"));;
+                    Chess.hilited.add(index);
+                    
+                }
+                break;
+        }
+    };
+    public void mouseDragged(MouseEvent e) {
+        System.out.println(e.getPoint());
+    };
+    public void mouseEntered(MouseEvent e) {};
+    public void mouseExited(MouseEvent e) {};
+    public void mouseMoved(MouseEvent e) {
+
+    };
+    public void mousePressed(MouseEvent e) {
+
+    };
+    public void mouseReleased(MouseEvent e) {
+
+    };
+
 }
