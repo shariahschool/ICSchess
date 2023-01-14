@@ -17,9 +17,20 @@ public class Chess{
         attackedBoard.clear();
         for(Square[] r : visualBoard){
             for(Square piece : r){
-                ArrayList<Move> moves = Piece.generatePawnAttacks(piece);
-                for(Move m : moves){
-                    attackedBoard.add(m.des);
+                if(piece.getPieceColor() == whiteTurn){
+                    if(piece.getPiece() == Piece.PAWN){
+                        for(Move m : Piece.generatePawnAttacks(piece)){
+                            attackedBoard.add(m.des);
+                        }
+                    }else if(piece.getPiece() == Piece.BISHOP || piece.getPiece() == Piece.ROOK || piece.getPiece() == Piece.QUEEN){
+                        for(Move m : Piece.generateLongAttacks(piece)){
+                            attackedBoard.add(m.des);
+                        }
+                    }else if(piece.getPiece() == Piece.KNIGHT){
+                        for(Move m : Piece.generateKnightAttacks(piece)){
+                            attackedBoard.add(m.des);
+                        }
+                    }
                 }
             }
         }
@@ -135,6 +146,7 @@ public class Chess{
         visuals.setLayout(new GridLayout(8,8));
         loadFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR");
         updateAttacked();
+        Piece.moves = Piece.generateMoves();
         System.out.println("ATTACKING");
         for(Square s : attackedBoard){
             System.out.println("Rank = "+s.getRank()+" File = "+s.getFile());

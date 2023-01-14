@@ -1,6 +1,7 @@
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 
 import javax.swing.*;
@@ -133,7 +134,7 @@ public class Square extends JPanel implements MouseInputListener{
 
     public static void handleMove(Square des){
             Square ori = lastSelected;
-            Chess.moveHistory.add(new Move(ori,des,des.getPiece()!=Piece.NONE));
+            Chess.moveHistory.add(new Move(ori,des));
             Chess.internalBoard[ori.getRank()][ori.getFile()] = Piece.NONE;
             Chess.internalBoard[des.getRank()][des.getFile()] = ori.getPiece();
 
@@ -147,7 +148,10 @@ public class Square extends JPanel implements MouseInputListener{
             des.revalidate();
             des.repaint();
 
+            Chess.updateAttacked();
             Chess.whiteTurn = !Chess.whiteTurn;
+            Piece.moves = Piece.generateMoves();
+            System.out.println(Arrays.deepToString(Chess.internalBoard));
     }
 
     @Override
@@ -164,8 +168,14 @@ public class Square extends JPanel implements MouseInputListener{
                 lastSelected = this;
                 System.out.println("Clicked on "+this.piece);
                 ArrayList<Move> moves = new ArrayList<Move>();
-                moves = Piece.generatePawnMoves(this);
+                for (Move move : Piece.moves){
+                    System.out.println("Ori: ("+move.ori.getRank()+", "+move.ori.getFile()+"), Des: ("+move.des.getRank()+", "+move.des.getFile()+")");
+                    if(move.ori == this){
+                        moves.add(move);
+                    }
+                }
                 for (Move m : moves) {
+                    System.out.println(m.des.getRank() +", "+m.des.getFile());
                     m.des.highlight();
                 }
 
