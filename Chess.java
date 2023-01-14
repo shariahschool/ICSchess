@@ -4,12 +4,27 @@ import java.util.ArrayList;
 
 public class Chess{
     static JFrame board = new JFrame("Chess");
-    static ArrayList<Square> visualBoard = new ArrayList<Square>(64);
-    static ArrayList<Piece> internalBoard = new ArrayList<Piece>(64);
+    static Square[][] visualBoard = new Square[8][8];
+    static int[][] internalBoard = new int[8][8];
+    static ArrayList<Square> attackedBoard = new ArrayList<Square>();
+    static ArrayList<Move> moveHistory = new ArrayList<Move>();
     static boolean whiteTurn = true;
+
 
     static ArrayList<Integer> hilited = new ArrayList<Integer>();
     
+    public static void updateAttacked(){
+        attackedBoard.clear();
+        for(Square[] r : visualBoard){
+            for(Square piece : r){
+                ArrayList<Move> moves = Piece.generatePawnAttacks(piece);
+                for(Move m : moves){
+                    attackedBoard.add(m.des);
+                }
+            }
+        }
+    }
+
     public static void loadFen(String fen){
         GridBagConstraints g = new GridBagConstraints();
         g.weightx = 1.0;
@@ -17,82 +32,83 @@ public class Chess{
         g.fill = GridBagConstraints.BOTH;
 
         char[] fenArr = fen.toCharArray();
-        int counter = 0;
+        int file = 0;
+        int rank = 0;
         for(char i: fenArr){
+            if(file==8){
+                file = 0;
+                rank++;
+            }
                 switch(Character.toLowerCase(i)){
                     case 'p':
-                        Piece temp = new Piece(counter, Piece.PAWN, Character.isUpperCase(i));
-                        internalBoard.add(temp);
-                        visualBoard.get(counter).add(temp,g);
-                        counter++;
+                        internalBoard[rank][file] = Piece.PAWN;
+                        Square s = visualBoard[rank][file];
+                        s.setPiece(Piece.PAWN);
+                        s.setPieceColor(Character.isUpperCase(i));
+                        s.revalidate();
+                        s.repaint();
+                        file++;
                         break;
                     case 'n':
-                        temp = new Piece(counter, Piece.KNIGHT, Character.isUpperCase(i));
-                        internalBoard.add(temp);
-                        visualBoard.get(counter).add(temp,g);
-                        counter++;
+                        internalBoard[rank][file] = Piece.KNIGHT;
+                        s = visualBoard[rank][file];
+                        s.setPiece(Piece.KNIGHT);
+                        s.setPieceColor(Character.isUpperCase(i));
+                        s.revalidate();
+                        s.repaint();
+                        file++;
                         break;
                     case 'b':
-                        temp = new Piece(counter, Piece.BISHOP, Character.isUpperCase(i));
-                        internalBoard.add(temp);
-                        visualBoard.get(counter).add(temp,g);
-                        counter++;
+                        internalBoard[rank][file] = Piece.BISHOP;
+                        s = visualBoard[rank][file];
+                        s.setPiece(Piece.BISHOP);
+                        s.setPieceColor(Character.isUpperCase(i));
+                        s.revalidate();
+                        s.repaint();
+                        file++;
                         break;
                     case 'r':
-                        temp = new Piece(counter, Piece.ROOK, Character.isUpperCase(i));
-                        internalBoard.add(temp);
-                        visualBoard.get(counter).add(temp,g);
-                        counter++;
+                        internalBoard[rank][file] = Piece.ROOK;
+                        s = visualBoard[rank][file];
+                        s.setPiece(Piece.ROOK);
+                        s.setPieceColor(Character.isUpperCase(i));
+                        s.revalidate();
+                        s.repaint();
+                        file++;
                         break;
                     case 'q':
-                        temp = new Piece(counter, Piece.QUEEN, Character.isUpperCase(i));
-                        internalBoard.add(temp);
-                        visualBoard.get(counter).add(temp,g);
-                        counter++;
+                        internalBoard[rank][file] = Piece.QUEEN;
+                        s = visualBoard[rank][file];
+                        s.setPiece(Piece.QUEEN);
+                        s.setPieceColor(Character.isUpperCase(i));
+                        s.revalidate();
+                        s.repaint();
+                        file++;
                         break;
                     case 'k':
-                        temp = new Piece(counter, Piece.KING, Character.isUpperCase(i));
-                        internalBoard.add(temp);
-                        visualBoard.get(counter).add(temp,g);
-                        counter++;
+                        internalBoard[rank][file] = Piece.KING;
+                        s = visualBoard[rank][file];
+                        s.setPiece(Piece.KING);
+                        s.setPieceColor(Character.isUpperCase(i));
+                        s.revalidate();
+                        s.repaint();
+                        file++;
                         break;
-                    /*case '/':
-                     int remaining = 8-counter%8;
-                        for(int j=0;j<remaining;j++){
-                            System.out.println("iteration" + j);
-                            temp = new Piece(counter, Piece.NONE, false);
-                            internalBoard.add(temp);
-                            visualBoard.get(counter).add(temp,g);
-                            counter++;
-
-                        }
-                        break;
-                        */
                     default:
                         if("12345678".contains(""+i)){
-                            System.out.println("test");
                             for(int j=0;j<Integer.parseInt(""+i);j++){
                                 System.out.println(Integer.parseInt(""+i));
-                                if((counter+1)%8==0){
-                                    temp = new Piece(counter, Piece.NONE, false);
-                                    internalBoard.add(temp);
-                                    visualBoard.get(counter).add(temp,g);
-                                    counter++;
-                                    break;
-                                } 
-                                temp = new Piece(counter, Piece.NONE, false);
-                                internalBoard.add(temp);
-                                visualBoard.get(counter).add(temp,g);
-                                counter++;
+                                s = visualBoard[rank][file];
+                                internalBoard[rank][file] = Piece.NONE;
+                                s.setPiece(Piece.NONE);
+                                s.setPieceColor(Piece.PIECE_BLACK);
+                                file++;
                                                                
                             }
                         }
                         break; 
 
                 }
-            }
-            for(Piece i : internalBoard){
-                System.out.println(i.getPiece());
             }
             
     }
@@ -106,20 +122,28 @@ public class Chess{
 
             for(int file = 0; file<8; file++){
                 System.out.println(""+(rank*8+file));
-                visualBoard.add(rank*8+file,new Square(file,rank,(rank+file)%2==0));
+                Square s = new Square(rank,file,Piece.NONE,Piece.PIECE_BLACK,(rank+file)%2==0);
+                visualBoard[rank][file] = s;
+                visuals.add(s);
             }
 
         }
 
-        for (Square i : visualBoard){
-            visuals.add(i);
-            visuals.revalidate();
-            visuals.repaint();
-        }
+
 
         visuals.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
         visuals.setLayout(new GridLayout(8,8));
         loadFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR");
+        updateAttacked();
+        System.out.println("ATTACKING");
+        for(Square s : attackedBoard){
+            System.out.println("Rank = "+s.getRank()+" File = "+s.getFile());
+        }
+        for(Square[] i : visualBoard){
+            for(Square s : i){
+                System.out.println(s.getPiece());
+            }
+        }
         board.setSize(800, 800);
         board.setMaximumSize(new Dimension(90,90));
         board.add(visuals);

@@ -1,14 +1,14 @@
 import java.awt.image.BufferedImage;
-import java.awt.*;
 import javax.swing.*;
-import javax.swing.event.MouseInputListener;
-import java.awt.event.MouseEvent;
+
 import javax.imageio.ImageIO;
 import java.io.File;
 import java.util.ArrayList;
-public class Piece extends JPanel implements MouseInputListener{
+
+public class Piece extends JPanel{
     private boolean isWhite;
-    private int index;
+    private int file;
+    private int rank;
     private int piece;
 
     public static final int NONE = 0;
@@ -18,6 +18,9 @@ public class Piece extends JPanel implements MouseInputListener{
     public static final int ROOK = 5;
     public static final int QUEEN = 9;
     public static final int KING = 10;
+
+    public static final boolean PIECE_WHITE = true;
+    public static final boolean PIECE_BLACK = false;
 
 
     static BufferedImage SHEET;
@@ -45,62 +48,6 @@ public class Piece extends JPanel implements MouseInputListener{
     }
 
     
-    
-
-
-
-    public Piece(int index, int piece, boolean color){
-        super();
-        this.setSize(90,90);
-        this.setOpaque(false);
-        this.setPiece(piece);
-        this.setWhite(color);
-        this.setIndex(index);
-        addMouseListener(this);
-        addMouseMotionListener(this);
-        
-    }
-
-    @Override
-    protected void paintComponent(Graphics g) {
-        super.paintComponent(g);
-        if(this.getIsWhite()){
-            switch(this.getPiece()){
-                case PAWN: g.drawImage(PAWN_WHITE,(getWidth()-90)/2,(getHeight()-90)/2,null);
-                    break;
-                case KNIGHT: g.drawImage(KNIGHT_WHITE,(getWidth()-90)/2,(getHeight()-90)/2,null);
-                    break;
-                case BISHOP: g.drawImage(BISHOP_WHITE,(getWidth()-90)/2,(getHeight()-90)/2,null);
-                    break;
-                case ROOK: g.drawImage(ROOK_WHITE,(getWidth()-90)/2,(getHeight()-90)/2,null);
-                    break;
-                case QUEEN: g.drawImage(QUEEN_WHITE,(getWidth()-90)/2,(getHeight()-90)/2,null);
-                    break;
-                case KING: g.drawImage(KING_WHITE,(getWidth()-90)/2,(getHeight()-90)/2,null);
-                    break;
-                default: break;
-            }
-        }else{
-            switch(this.getPiece()){
-                case PAWN: g.drawImage(PAWN_BLACK,(getWidth()-90)/2,(getHeight()-90)/2,null);
-                    break;
-                case KNIGHT: g.drawImage(KNIGHT_BLACK,(getWidth()-90)/2,(getHeight()-90)/2,null);
-                    break;
-                case BISHOP: g.drawImage(BISHOP_BLACK,(getWidth()-90)/2,(getHeight()-90)/2,null);
-                    break;
-                case ROOK: g.drawImage(ROOK_BLACK,(getWidth()-90)/2,(getHeight()-90)/2,null);
-                    break;
-                case QUEEN: g.drawImage(QUEEN_BLACK,(getWidth()-90)/2,(getHeight()-90)/2,null);
-                    break;
-                case KING: g.drawImage(KING_BLACK,(getWidth()-90)/2,(getHeight()-90)/2,null);
-                    break;
-                default: break;
-            }
-        }
-    }
-
-
-    
     public void setPiece(int piece) {
         this.piece = piece;
     }
@@ -113,94 +60,93 @@ public class Piece extends JPanel implements MouseInputListener{
         return piece;
     }
 
-    public void setIndex(int index){
-        this.index = index;
+    public void setFile(int file){
+        this.file = file;
     }
 
-    public int getIndex(){
-        return this.index;
+    public int getfile(){
+        return this.file;
+    }
+
+    public void setRank(int rank){
+        this.rank = rank;
+    }
+
+    public int getRank(){
+        return this.rank;
     }
 
     public boolean getIsWhite() {
         return this.isWhite;
     }
 
+    public static ArrayList<Move> generatePawnAttacks(Square s){
+        ArrayList<Move> moves = new ArrayList<Move>(4);
+        int sRank = s.getRank();
+        int sFile = s.getFile();
+        Square[][] vboard = Chess.visualBoard;
+        boolean color = s.getPieceColor();
+        if(color == PIECE_BLACK && s.getPiece()!=Piece.NONE){
+            if(sRank+1<8 && sFile+1<8){
+                moves.add(new Move(s,vboard[sRank+1][sFile+1], true));
+            }
 
-    public ArrayList<Integer> generatePawnMoves(){
-        boolean starting = false;
-        ArrayList<Integer> moves = new ArrayList<Integer>();
-        if(this.isWhite){
-            starting = index>47&&index<56;
-
-            if(this.index-8>=0&&Chess.internalBoard.get(index-8).getPiece() == NONE){
-                moves.add(index-8);
-            }
-            if(starting && this.index-16>=0&&Chess.internalBoard.get(index-16).getPiece() == NONE){
-                moves.add(index-16);
-            }
-            if(this.index-9>=0&&Chess.internalBoard.get(index-9).getPiece() != NONE && Chess.internalBoard.get(index-7).getIsWhite() != this.isWhite){
-                moves.add(index-9);
-            }
-            if(this.index-7>=0&&Chess.internalBoard.get(index-7).getPiece() != NONE && Chess.internalBoard.get(index-7).getIsWhite() != this.isWhite){
-                moves.add(index-7);
-            }
-        }else{
-            starting = index>7&&index<16;
-
-            if(this.index+8<=63&&Chess.internalBoard.get(index+8).getPiece() == NONE){
-                moves.add(index+8);
-            }
-            if(starting && this.index+16<=63&&Chess.internalBoard.get(index+16).getPiece() == NONE){
-                moves.add(index+16);
-            }
-            if(this.index+9<=63&&Chess.internalBoard.get(index+9).getPiece() != NONE && Chess.internalBoard.get(index-7).getIsWhite() != this.isWhite){
-                moves.add(index+9);
-            }
-            if(this.index+7<=63&&Chess.internalBoard.get(index+7).getPiece() != NONE && Chess.internalBoard.get(index-7).getIsWhite() != this.isWhite){
-                moves.add(index+7);
+            if(sRank+1<8 && sFile-1>=0){
+                moves.add(new Move(s,vboard[sRank+1][sFile-1], true));
             }
         }
- 
         return moves;
-
     }
 
+    public static ArrayList<Move> generatePawnMoves(Square s){
+        ArrayList<Move> moves = new ArrayList<Move>(4);
+        int sRank = s.getRank();
+        int sFile = s.getFile();
+        int[][] board = Chess.internalBoard;
+        Square[][] vboard = Chess.visualBoard;
+        boolean color = s.getPieceColor();
 
-    public void mouseClicked(MouseEvent e) {
-        System.out.println(this.index);
-        GridBagConstraints g = new GridBagConstraints();
-        for(int h : Chess.hilited){
-            Chess.visualBoard.get(h).setBackground(Chess.visualBoard.get(h).isWhite()?Color.decode("#ECB069"):Color.decode("#763C2C"));
-        }
-        Chess.hilited.clear();
-        g.weightx = 1.0;
-        g.weighty = 1.0;
-        g.fill = GridBagConstraints.BOTH;
-        switch(this.piece){
-            case NONE:
-                break;
-            case PAWN:
-                for(int index : generatePawnMoves()){
-                    Chess.visualBoard.get(index).setBackground(Color.decode("#F88379"));;
-                    Chess.hilited.add(index);
-                    
+        if(color == PIECE_WHITE){
+            boolean atStart = sRank==6;
+            if(sRank-1>=0 && board[sRank-1][sFile] == NONE){
+                moves.add(new Move(s,vboard[sRank-1][sFile], false));
+
+                if(atStart && sRank-2>=0 && board[sRank-2][sFile] == NONE){
+                    moves.add(new Move(s,vboard[sRank-2][sFile], false));
                 }
-                break;
+            }
+
+            if(sRank-1>=0 && sFile-1>=0 && board[sRank-1][sFile-1] != NONE && vboard[sRank-1][sFile-1].getPieceColor() != color){
+                moves.add(new Move(s,vboard[sRank-1][sFile-1], true));
+            }
+
+            if(sRank-1>=0 && sFile+1<8 && board[sRank-1][sFile+1] != NONE && vboard[sRank-1][sFile+1].getPieceColor() != color){
+                moves.add(new Move(s,vboard[sRank-1][sFile+1], true));
+            }
         }
-    };
-    public void mouseDragged(MouseEvent e) {
-        System.out.println(e.getPoint());
-    };
-    public void mouseEntered(MouseEvent e) {};
-    public void mouseExited(MouseEvent e) {};
-    public void mouseMoved(MouseEvent e) {
+        else{
+            boolean atStart = sRank==1;
+            if(sRank+1<8 && board[sRank+1][sFile] == NONE){
+                moves.add(new Move(s,vboard[sRank+1][sFile], false));
 
-    };
-    public void mousePressed(MouseEvent e) {
+                if(atStart && sRank+2<8 && board[sRank+2][sFile] == NONE){
+                    moves.add(new Move(s,vboard[sRank+2][sFile], false));
+                }
+            }
 
-    };
-    public void mouseReleased(MouseEvent e) {
+            if(sRank+1<8 && sFile+1<8 && board[sRank+1][sFile+1] != NONE && vboard[sRank+1][sFile+1].getPieceColor() != color){
+                moves.add(new Move(s,vboard[sRank+1][sFile+1], true));
+            }
 
-    };
+            if(sRank+1<8 && sFile-1>=0 && board[sRank+1][sFile-1] != NONE && vboard[sRank+1][sFile-1].getPieceColor() != color){
+                moves.add(new Move(s,vboard[sRank+1][sFile-1], true));
+            }
+        }
+        
+        
+        
+
+        return moves;
+    }
 
 }
