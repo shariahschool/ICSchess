@@ -4,7 +4,6 @@ import javax.swing.*;
 import javax.imageio.ImageIO;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
 
 public class Piece extends JPanel{

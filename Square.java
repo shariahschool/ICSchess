@@ -203,7 +203,7 @@ public class Square extends JPanel implements MouseInputListener{
     public static void unmakeMove(){
         if(Chess.moveHistory.size()!=0){
             Move m = Chess.moveHistory.get(Chess.moveHistory.size()-1);
-            System.out.println("Unmaking move: ("+ m.ori.getRank()+", "+m.ori.getFile()+") "+m.ori.getPiece()+" , ("+m.des.getRank()+", "+m.des.getFile()+") "+m.des.getPiece());
+            //System.out.println("Unmaking move: ("+ m.ori.getRank()+", "+m.ori.getFile()+") "+m.ori.getPiece()+" , ("+m.des.getRank()+", "+m.des.getFile()+") "+m.des.getPiece());
 
             Square newDes = Chess.visualBoard[m.des.getRank()][m.des.getFile()];
             Square newOri = Chess.visualBoard[m.ori.getRank()][m.ori.getFile()];
@@ -229,13 +229,19 @@ public class Square extends JPanel implements MouseInputListener{
         if(this.highlightedSquare){
             handleMove(this);
             Piece.moves = Piece.filterMoves();
-            Chess.updateAttacked();
+            if(Piece.moves.size() == 0){
+                System.out.println("CHECKMATE, "+(Chess.gameTurn==Piece.PIECE_BLACK?"White King Wins!":"Black King Wins!"));
+            }else{
+                Chess.updateAttacked();
+                Ai.aiMove();
+            }
+
             
             unhighlightAll();
         }else{
 
             unhighlightAll();
-            System.out.println("Fired");
+            //System.out.println("Fired");
             if(this.piece != Piece.NONE && this.pieceColor == Chess.gameTurn){
                 lastSelected = this;
 
@@ -243,7 +249,7 @@ public class Square extends JPanel implements MouseInputListener{
                 for (Move move : Piece.moves){
                     //System.out.println("IN MOVES: "+move.ori.getPiece()+" "+move.ori.getPieceColor()+" "+move.ori.getRank()+", "+move.ori.getFile()+"    "+move.des.getPiece()+" "+move.des.getPieceColor()+" "+move.des.getRank()+", "+move.des.getFile());
                     if(this.equals(move.ori)){
-                        System.out.println("Valid MOVES: "+move.ori.getRank()+", "+move.ori.getFile()+"  "+move.des.getRank()+", "+move.des.getFile());
+                        //System.out.println("Valid MOVES: "+move.ori.getRank()+", "+move.ori.getFile()+"  "+move.des.getRank()+", "+move.des.getFile());
                         moves.add(move);
                     }
                 }
