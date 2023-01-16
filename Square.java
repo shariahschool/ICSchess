@@ -15,13 +15,14 @@ public class Square extends JPanel implements MouseInputListener{
 
     public static ArrayList<Square> highlighted = new ArrayList<Square>();
     private int piece;
-    private boolean pieceColor;
+    private int pieceColor;
+    private boolean pieceProt = false;
 
     public boolean highlightedSquare = false;
     public static Square lastSelected = null;
     
 
-    public Square(int x, int y, int piece, boolean pieceColor, boolean white){
+    public Square(int x, int y, int piece, int pieceColor, boolean white){
         super();
         this.setPreferredSize(new Dimension(100,100));
         this.setLayout(new GridBagLayout());
@@ -36,7 +37,7 @@ public class Square extends JPanel implements MouseInputListener{
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        if(this.getPieceColor()){
+        if(this.getPieceColor() == Piece.PIECE_WHITE){
             switch(this.getPiece()){
                 case Piece.PAWN: g.drawImage(Piece.PAWN_WHITE,(getWidth()-90)/2,(getHeight()-90)/2,null);
                     break;
@@ -50,7 +51,8 @@ public class Square extends JPanel implements MouseInputListener{
                     break;
                 case Piece.KING: g.drawImage(Piece.KING_WHITE,(getWidth()-90)/2,(getHeight()-90)/2,null);
                     break;
-                default: break;
+                default: 
+                    break;
             }
         }else{
             switch(this.getPiece()){
@@ -72,6 +74,12 @@ public class Square extends JPanel implements MouseInputListener{
     }
 
 
+    public boolean isProt(){
+        return this.pieceProt;
+    }
+    public void setProt(boolean prot){
+        this.pieceProt = prot;
+    }
     public boolean isWhiteSquare(){
         return this.whiteSquare;
     }
@@ -92,17 +100,21 @@ public class Square extends JPanel implements MouseInputListener{
         this.piece = piece;
     }
 
-    public boolean getPieceColor() {
+    public int getPieceColor() {
         return pieceColor;
     }
 
-    public void setPieceColor(boolean pieceColor) {
+    public void setPieceColor(int pieceColor) {
         this.pieceColor = pieceColor;
     }
 
     public void setWhiteSquare(boolean white){
         super.setBackground(white?Color.decode("#ECB069"):Color.decode("#763C2C"));
         this.whiteSquare = white;
+        Chess.board.revalidate();
+        Chess.board.repaint();
+        this.revalidate();
+        this.repaint();
     }
 
     public void setRank(int x){
@@ -117,6 +129,10 @@ public class Square extends JPanel implements MouseInputListener{
         highlighted.add(this);
         this.highlightedSquare = true;
         this.setBackground(Color.decode("#FF5733"));
+        Chess.board.revalidate();
+        Chess.board.repaint();
+        this.revalidate();
+        this.repaint();
     }
 
     public void unhighlight(){
@@ -134,6 +150,13 @@ public class Square extends JPanel implements MouseInputListener{
 
     public static void handleMove(Square des){
             Square ori = lastSelected;
+            if(ori.getPiece() == Piece.KING){
+                if(ori.getPieceColor() == Piece.PIECE_BLACK){
+                    Chess.blackKing = des;
+                }else{
+                    Chess.whiteKing = des;
+                }
+            }
             Chess.moveHistory.add(new Move(ori,des));
             Chess.internalBoard[ori.getRank()][ori.getFile()] = Piece.NONE;
             Chess.internalBoard[des.getRank()][des.getFile()] = ori.getPiece();
@@ -147,41 +170,97 @@ public class Square extends JPanel implements MouseInputListener{
             ori.repaint();
             des.revalidate();
             des.repaint();
+            
 
-            Chess.updateAttacked();
-            Chess.whiteTurn = !Chess.whiteTurn;
-            Piece.moves = Piece.generateMoves();
-            System.out.println(Arrays.deepToString(Chess.internalBoard));
+            Chess.gameTurn = Chess.gameTurn==Piece.PIECE_WHITE?Piece.PIECE_BLACK:Piece.PIECE_WHITE;
+            //System.out.println(Arrays.deepToString(Chess.internalBoard));
+    }
+
+    public static void handleMove(Square oriold,Square desold){
+        Square des = Chess.visualBoard[desold.getRank()][desold.getFile()];
+        Square ori = Chess.visualBoard[oriold.getRank()][oriold.getFile()];
+        Chess.moveHistory.add(new Move(ori,des));
+        Chess.internalBoard[ori.getRank()][ori.getFile()] = Piece.NONE;
+        Chess.internalBoard[des.getRank()][des.getFile()] = ori.getPiece();
+
+        
+        
+        des.setPiece(ori.getPiece());
+        des.setPieceColor(ori.getPieceColor());
+        ori.setPiece(Piece.NONE);
+        ori.setPieceColor(Piece.PIECE_BLACK);
+        ori.revalidate();
+        ori.repaint();
+        des.revalidate();
+        des.repaint();
+
+        
+        Chess.gameTurn = Chess.gameTurn==Piece.PIECE_WHITE?Piece.PIECE_BLACK:Piece.PIECE_WHITE;
+
+        //System.out.println(Arrays.deepToString(Chess.internalBoard));
+}
+
+    public static void unmakeMove(){
+        if(Chess.moveHistory.size()!=0){
+            Move m = Chess.moveHistory.get(Chess.moveHistory.size()-1);
+            System.out.println("Unmaking move: ("+ m.ori.getRank()+", "+m.ori.getFile()+") "+m.ori.getPiece()+" , ("+m.des.getRank()+", "+m.des.getFile()+") "+m.des.getPiece());
+
+            Square newDes = Chess.visualBoard[m.des.getRank()][m.des.getFile()];
+            Square newOri = Chess.visualBoard[m.ori.getRank()][m.ori.getFile()];
+            Chess.internalBoard[newOri.getRank()][newOri.getFile()] = m.ori.getPiece();
+            Chess.internalBoard[newDes.getRank()][newDes.getFile()] = m.des.getPiece();
+            newDes.setPiece(m.des.getPiece());
+            newDes.setPieceColor(m.des.getPieceColor());
+            newOri.setPiece(m.ori.getPiece());
+            newOri.setPieceColor(m.ori.getPieceColor());
+            newOri.revalidate();
+            newOri.repaint();
+            newDes.revalidate();
+            newDes.repaint();
+
+            Chess.gameTurn = Chess.gameTurn==Piece.PIECE_WHITE?Piece.PIECE_BLACK:Piece.PIECE_WHITE;
+
+            Chess.moveHistory.remove(Chess.moveHistory.size()-1);
+        }
     }
 
     @Override
     public void mouseClicked(MouseEvent e) {
-        System.out.println(this.rank + ", "+this.file);
         if(this.highlightedSquare){
             handleMove(this);
+            Piece.moves = Piece.filterMoves();
+            Chess.updateAttacked();
+            
             unhighlightAll();
         }else{
 
             unhighlightAll();
             System.out.println("Fired");
-            if(this.piece != Piece.NONE && this.pieceColor == Chess.whiteTurn){
+            if(this.piece != Piece.NONE && this.pieceColor == Chess.gameTurn){
                 lastSelected = this;
-                System.out.println("Clicked on "+this.piece);
+
                 ArrayList<Move> moves = new ArrayList<Move>();
                 for (Move move : Piece.moves){
-                    System.out.println("Ori: ("+move.ori.getRank()+", "+move.ori.getFile()+"), Des: ("+move.des.getRank()+", "+move.des.getFile()+")");
-                    if(move.ori == this){
+                    //System.out.println("IN MOVES: "+move.ori.getPiece()+" "+move.ori.getPieceColor()+" "+move.ori.getRank()+", "+move.ori.getFile()+"    "+move.des.getPiece()+" "+move.des.getPieceColor()+" "+move.des.getRank()+", "+move.des.getFile());
+                    if(this.equals(move.ori)){
+                        System.out.println("Valid MOVES: "+move.ori.getRank()+", "+move.ori.getFile()+"  "+move.des.getRank()+", "+move.des.getFile());
                         moves.add(move);
                     }
                 }
                 for (Move m : moves) {
-                    System.out.println(m.des.getRank() +", "+m.des.getFile());
-                    m.des.highlight();
+                    Chess.visualBoard[m.des.getRank()][m.des.getFile()].highlight();
                 }
 
             }
         }
     }
+
+    @Override
+    public boolean equals(Object o){
+        Square s = (Square) o;
+        return s.getPiece() == this.piece && s.getRank() == this.getRank() && this.getFile() == s.getFile();
+    }
+
     @Override
     public void mouseDragged(MouseEvent e) {
         // TODO Auto-generated method stub

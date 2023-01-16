@@ -8,33 +8,27 @@ public class Chess{
     static int[][] internalBoard = new int[8][8];
     static ArrayList<Square> attackedBoard = new ArrayList<Square>();
     static ArrayList<Move> moveHistory = new ArrayList<Move>();
-    static boolean whiteTurn = true;
+    static int gameTurn = Piece.PIECE_WHITE;
+
+    static Square whiteKing;
+    static Square blackKing;
 
 
     static ArrayList<Integer> hilited = new ArrayList<Integer>();
     
+
     public static void updateAttacked(){
         attackedBoard.clear();
         for(Square[] r : visualBoard){
             for(Square piece : r){
-                if(piece.getPieceColor() == whiteTurn){
-                    if(piece.getPiece() == Piece.PAWN){
-                        for(Move m : Piece.generatePawnAttacks(piece)){
-                            attackedBoard.add(m.des);
-                        }
-                    }else if(piece.getPiece() == Piece.BISHOP || piece.getPiece() == Piece.ROOK || piece.getPiece() == Piece.QUEEN){
-                        for(Move m : Piece.generateLongAttacks(piece)){
-                            attackedBoard.add(m.des);
-                        }
-                    }else if(piece.getPiece() == Piece.KNIGHT){
-                        for(Move m : Piece.generateKnightAttacks(piece)){
-                            attackedBoard.add(m.des);
-                        }
-                    }
+                if(piece.isProt()){
+                    attackedBoard.add(piece);
                 }
             }
         }
     }
+
+    
 
     public static void loadFen(String fen){
         GridBagConstraints g = new GridBagConstraints();
@@ -55,7 +49,7 @@ public class Chess{
                         internalBoard[rank][file] = Piece.PAWN;
                         Square s = visualBoard[rank][file];
                         s.setPiece(Piece.PAWN);
-                        s.setPieceColor(Character.isUpperCase(i));
+                        s.setPieceColor(Character.isUpperCase(i)?Piece.PIECE_WHITE:Piece.PIECE_BLACK);
                         s.revalidate();
                         s.repaint();
                         file++;
@@ -64,7 +58,7 @@ public class Chess{
                         internalBoard[rank][file] = Piece.KNIGHT;
                         s = visualBoard[rank][file];
                         s.setPiece(Piece.KNIGHT);
-                        s.setPieceColor(Character.isUpperCase(i));
+                        s.setPieceColor(Character.isUpperCase(i)?Piece.PIECE_WHITE:Piece.PIECE_BLACK);
                         s.revalidate();
                         s.repaint();
                         file++;
@@ -73,7 +67,7 @@ public class Chess{
                         internalBoard[rank][file] = Piece.BISHOP;
                         s = visualBoard[rank][file];
                         s.setPiece(Piece.BISHOP);
-                        s.setPieceColor(Character.isUpperCase(i));
+                        s.setPieceColor(Character.isUpperCase(i)?Piece.PIECE_WHITE:Piece.PIECE_BLACK);
                         s.revalidate();
                         s.repaint();
                         file++;
@@ -82,7 +76,7 @@ public class Chess{
                         internalBoard[rank][file] = Piece.ROOK;
                         s = visualBoard[rank][file];
                         s.setPiece(Piece.ROOK);
-                        s.setPieceColor(Character.isUpperCase(i));
+                        s.setPieceColor(Character.isUpperCase(i)?Piece.PIECE_WHITE:Piece.PIECE_BLACK);
                         s.revalidate();
                         s.repaint();
                         file++;
@@ -91,7 +85,7 @@ public class Chess{
                         internalBoard[rank][file] = Piece.QUEEN;
                         s = visualBoard[rank][file];
                         s.setPiece(Piece.QUEEN);
-                        s.setPieceColor(Character.isUpperCase(i));
+                        s.setPieceColor(Character.isUpperCase(i)?Piece.PIECE_WHITE:Piece.PIECE_BLACK);
                         s.revalidate();
                         s.repaint();
                         file++;
@@ -100,19 +94,23 @@ public class Chess{
                         internalBoard[rank][file] = Piece.KING;
                         s = visualBoard[rank][file];
                         s.setPiece(Piece.KING);
-                        s.setPieceColor(Character.isUpperCase(i));
+                        s.setPieceColor(Character.isUpperCase(i)?Piece.PIECE_WHITE:Piece.PIECE_BLACK);
                         s.revalidate();
                         s.repaint();
                         file++;
+                        if(Character.isUpperCase(i)){
+                            whiteKing = visualBoard[rank][file];
+                        }else{
+                            blackKing = visualBoard[rank][file];
+                        }
                         break;
                     default:
                         if("12345678".contains(""+i)){
                             for(int j=0;j<Integer.parseInt(""+i);j++){
-                                System.out.println(Integer.parseInt(""+i));
                                 s = visualBoard[rank][file];
                                 internalBoard[rank][file] = Piece.NONE;
                                 s.setPiece(Piece.NONE);
-                                s.setPieceColor(Piece.PIECE_BLACK);
+                                s.setPieceColor(Piece.PIECE_NOT_CONTROLLED);
                                 file++;
                                                                
                             }
@@ -146,16 +144,8 @@ public class Chess{
         visuals.setLayout(new GridLayout(8,8));
         loadFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR");
         updateAttacked();
-        Piece.moves = Piece.generateMoves();
-        System.out.println("ATTACKING");
-        for(Square s : attackedBoard){
-            System.out.println("Rank = "+s.getRank()+" File = "+s.getFile());
-        }
-        for(Square[] i : visualBoard){
-            for(Square s : i){
-                System.out.println(s.getPiece());
-            }
-        }
+        Piece.moves = Piece.filterMoves();
+
         board.setSize(800, 800);
         board.setMaximumSize(new Dimension(90,90));
         board.add(visuals);
