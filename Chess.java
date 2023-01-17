@@ -168,7 +168,6 @@ public class Chess{
         for(int rank = 0; rank<8; rank++){
 
             for(int file = 0; file<8; file++){
-                System.out.println(""+(rank*8+file));
                 Square s = new Square(rank,file,Piece.NONE,Piece.PIECE_BLACK,(rank+file)%2==0);
                 visualBoard[rank][file] = s;
                 visuals.add(s);

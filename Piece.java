@@ -2,7 +2,6 @@ import java.awt.image.BufferedImage;
 import javax.swing.*;
 
 import javax.imageio.ImageIO;
-import javax.sound.midi.VoiceStatus;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -401,7 +400,6 @@ public class Piece extends JPanel{
         }
         Chess.board.revalidate();
         Chess.board.repaint();
-        System.out.println(Chess.whitePieces.size());
         date = new Date();
         System.out.println(date.getTime() - milli);
         return filtered;
