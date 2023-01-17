@@ -248,10 +248,14 @@ public class Square extends JPanel implements MouseInputListener{
             lastSelected.setWhiteSquare(lastSelected.isWhiteSquare());
             Piece.moves = Piece.filterMoves();
             if(Piece.moves.size() == 0){
-                System.out.println("CHECKMATE, "+(Chess.gameTurn==Piece.PIECE_BLACK?"White King Wins!":"Black King Wins!"));
+                if(Piece.generateAttackRays().contains(Chess.gameTurn==Piece.PIECE_BLACK?Chess.blackKing:Chess.whiteKing)){
+                    System.out.println("CHECKMATE, "+(Chess.gameTurn==Piece.PIECE_BLACK?"White King Wins!":"Black King Wins!"));
+                }else{
+                    System.out.println("STALEMATE, DRAW");
+                }
             }else{
                 Chess.updateAttacked();
-                Ai.aiMove();
+                //Ai.aiMove();
             }
 
             

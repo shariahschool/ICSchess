@@ -168,6 +168,18 @@ public class Piece extends JPanel{
             }
         }
     }
+
+       public static void castKingRay(Square s, ArrayList<Square> rSquares){
+        //UP RIGHT DOWN LEFT LEFT_UP RIGHT_UP RIGHT_DOWN LEFT_DOWN
+        int sRank = s.getRank();
+        int sFile = s.getFile();
+        int offsets[][] = {{1,0},{0,-1},{-1,0},{0,1},{1,1},{1,-1},{-1,-1},{-1,1}};
+        for(int[] off : offsets){
+            if(sRank+off[0]<8 && sRank+off[0]>=0 && sFile+off[1]<8 && sFile+off[1]>=0){
+                rSquares.add(Chess.visualBoard[sRank+off[0]][sFile+off[1]]);
+            }
+        }
+    }
     
 
 
@@ -283,7 +295,7 @@ public class Piece extends JPanel{
         int[][] offsets = {{1,0},{0,-1},{-1,0},{0,1},{1,1},{1,-1},{-1,-1},{-1,1}};
         int[] spaces = getSquaresToEdge(s);
         int startIndex = s.getPiece()==BISHOP?4:0;
-        int endIndex = s.getPiece()==ROOK?5:8;
+        int endIndex = s.getPiece()==ROOK?4:8;
         for(int direction = startIndex; direction<endIndex;direction++){
                 if(spaces[direction]!=0){
                     for(int i = 0;i<spaces[direction];i++){
@@ -370,6 +382,9 @@ public class Piece extends JPanel{
                             break;
                         case QUEEN:
                             castQueenRay(s, squares);
+                            break;
+                        case KING:
+                            castKingRay(s, squares);
                             break;
                         default:break;
                     }
