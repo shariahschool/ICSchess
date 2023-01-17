@@ -10,8 +10,16 @@ public class Chess{
     static ArrayList<Move> moveHistory = new ArrayList<Move>();
     static int gameTurn = Piece.PIECE_WHITE;
 
+    static ArrayList<Square> whitePieces = new ArrayList<Square>();
+    static ArrayList<Square> blackPieces = new ArrayList<Square>();
+
+
     static Square whiteKing;
     static Square blackKing;
+
+    static boolean blackCanCastleK;
+    static boolean blackCanCastleQ;
+    static boolean whiteCanCastle;
 
 
     static ArrayList<Integer> hilited = new ArrayList<Integer>();
@@ -50,6 +58,11 @@ public class Chess{
                         Square s = visualBoard[rank][file];
                         s.setPiece(Piece.PAWN);
                         s.setPieceColor(Character.isUpperCase(i)?Piece.PIECE_WHITE:Piece.PIECE_BLACK);
+                        if(Character.isUpperCase(i)){
+                            whitePieces.add(visualBoard[rank][file]);
+                        }else{
+                            blackPieces.add(visualBoard[rank][file]);
+                        }
                         s.revalidate();
                         s.repaint();
                         file++;
@@ -59,6 +72,11 @@ public class Chess{
                         s = visualBoard[rank][file];
                         s.setPiece(Piece.KNIGHT);
                         s.setPieceColor(Character.isUpperCase(i)?Piece.PIECE_WHITE:Piece.PIECE_BLACK);
+                        if(Character.isUpperCase(i)){
+                            whitePieces.add(visualBoard[rank][file]);
+                        }else{
+                            blackPieces.add(visualBoard[rank][file]);
+                        }
                         s.revalidate();
                         s.repaint();
                         file++;
@@ -68,6 +86,11 @@ public class Chess{
                         s = visualBoard[rank][file];
                         s.setPiece(Piece.BISHOP);
                         s.setPieceColor(Character.isUpperCase(i)?Piece.PIECE_WHITE:Piece.PIECE_BLACK);
+                        if(Character.isUpperCase(i)){
+                            whitePieces.add(visualBoard[rank][file]);
+                        }else{
+                            blackPieces.add(visualBoard[rank][file]);
+                        }
                         s.revalidate();
                         s.repaint();
                         file++;
@@ -77,6 +100,11 @@ public class Chess{
                         s = visualBoard[rank][file];
                         s.setPiece(Piece.ROOK);
                         s.setPieceColor(Character.isUpperCase(i)?Piece.PIECE_WHITE:Piece.PIECE_BLACK);
+                        if(Character.isUpperCase(i)){
+                            whitePieces.add(visualBoard[rank][file]);
+                        }else{
+                            blackPieces.add(visualBoard[rank][file]);
+                        }
                         s.revalidate();
                         s.repaint();
                         file++;
@@ -86,6 +114,11 @@ public class Chess{
                         s = visualBoard[rank][file];
                         s.setPiece(Piece.QUEEN);
                         s.setPieceColor(Character.isUpperCase(i)?Piece.PIECE_WHITE:Piece.PIECE_BLACK);
+                        if(Character.isUpperCase(i)){
+                            whitePieces.add(visualBoard[rank][file]);
+                        }else{
+                            blackPieces.add(visualBoard[rank][file]);
+                        }
                         s.revalidate();
                         s.repaint();
                         file++;
@@ -95,14 +128,19 @@ public class Chess{
                         s = visualBoard[rank][file];
                         s.setPiece(Piece.KING);
                         s.setPieceColor(Character.isUpperCase(i)?Piece.PIECE_WHITE:Piece.PIECE_BLACK);
-                        s.revalidate();
-                        s.repaint();
-                        file++;
+                        if(Character.isUpperCase(i)){
+                            whitePieces.add(visualBoard[rank][file]);
+                        }else{
+                            blackPieces.add(visualBoard[rank][file]);
+                        }
                         if(Character.isUpperCase(i)){
                             whiteKing = visualBoard[rank][file];
                         }else{
                             blackKing = visualBoard[rank][file];
                         }
+                        s.revalidate();
+                        s.repaint();
+                        file++;
                         break;
                     default:
                         if("12345678".contains(""+i)){

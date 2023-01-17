@@ -2,8 +2,11 @@ import java.awt.image.BufferedImage;
 import javax.swing.*;
 
 import javax.imageio.ImageIO;
+import javax.sound.midi.VoiceStatus;
+
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 
 public class Piece extends JPanel{
@@ -83,6 +86,92 @@ public class Piece extends JPanel{
         return this.isWhite;
     }
 
+    public static void castBishopRay(Square s, ArrayList<Square> rSquares){
+
+        int[][] offsets = {{1,1},{1,-1},{-1,-1},{-1,1}};
+        int[] spaces = getSquaresToEdge(s);
+        int sRank = s.getRank();
+        int sFile = s.getFile();
+        for(int offset = 0; offset<4;offset++){
+            for(int i = 0; i<spaces[offset+4];i++){
+                Square square = Chess.visualBoard[sRank+offsets[offset][0]*(i+1)][sFile+offsets[offset][1]*(i+1)];
+
+                rSquares.add(square);
+                if(square.getPiece() != Piece.NONE){
+                    break;
+                }
+            }
+        }
+    }
+
+    public static void castRookRay(Square s, ArrayList<Square> rSquares){
+        int[][] offsets = {{1,0},{0,-1},{-1,0},{0,1}};
+        int[] spaces = getSquaresToEdge(s);
+        int sRank = s.getRank();
+        int sFile = s.getFile();
+        for(int offset = 0; offset<4;offset++){
+            for(int i = 0; i<spaces[offset];i++){
+                Square square = Chess.visualBoard[sRank+offsets[offset][0]*(i+1)][sFile+offsets[offset][1]*(i+1)];
+                rSquares.add(square);
+                if(square.getPiece() != Piece.NONE){
+                    break;
+                }
+            }
+        }
+    }
+    //[s.getRank()+offsets[direction][0]*(i+1)][s.getFile()+offsets[direction][1]*(i+1)]
+    public static void castQueenRay(Square s, ArrayList<Square> rSquares){
+        int[][] offsets = {{1,0},{0,-1},{-1,0},{0,1},{1,1},{1,-1},{-1,-1},{-1,1}};
+        int[] spaces = getSquaresToEdge(s);
+        int sRank = s.getRank();
+        int sFile = s.getFile();
+        for(int offset = 0; offset<8;offset++){
+            for(int i = 0; i<spaces[offset];i++){
+                Square square = Chess.visualBoard[sRank+offsets[offset][0]*(i+1)][sFile+offsets[offset][1]*(i+1)];
+                rSquares.add(square);
+                if(square.getPiece() != Piece.NONE){
+                    break;
+                }
+            }
+        }
+    }
+
+    public static void castPawnRay(Square s, ArrayList<Square> rSquares){
+        //UP RIGHT DOWN LEFT LEFT_UP RIGHT_UP RIGHT_DOWN LEFT_DOWN
+        int sRank = s.getRank();
+        int sFile = s.getFile();
+        int[] spaces = getSquaresToEdge(s);
+        if(s.getPieceColor() == Piece.PIECE_WHITE){
+            if(spaces[6] != 0){
+                rSquares.add(Chess.visualBoard[sRank-1][sFile-1]);
+            }
+            if(spaces[7] != 0){
+                rSquares.add(Chess.visualBoard[sRank-1][sFile+1]);
+            }
+        }else{
+            if(spaces[4] != 0){
+                rSquares.add(Chess.visualBoard[sRank+1][sFile+1]); 
+            }
+            if(spaces[5] != 0){
+                rSquares.add(Chess.visualBoard[sRank+1][sFile-1]);
+            }
+        }
+    }
+
+    public static void castKnightRay(Square s, ArrayList<Square> rSquares){
+        //UP RIGHT DOWN LEFT LEFT_UP RIGHT_UP RIGHT_DOWN LEFT_DOWN
+        int sRank = s.getRank();
+        int sFile = s.getFile();
+        int offsets[][] = {{2,1},{2,-1},{1,2},{-1,2},{1,-2},{-1,-2},{-2,1},{-2,-1}};
+        for(int[] off : offsets){
+            if(sRank+off[0]<8 && sRank+off[0]>=0 && sFile+off[1]<8 && sFile+off[1]>=0){
+                rSquares.add(Chess.visualBoard[sRank+off[0]][sFile+off[1]]);
+            }
+        }
+    }
+    
+
+
     public static ArrayList<Move> generatePawnAttacks(Square s){
         ArrayList<Move> moves = new ArrayList<Move>(4);
         int sRank = s.getRank();
@@ -112,14 +201,16 @@ public class Piece extends JPanel{
     }
 
     public static void generateKingMoves(Square s, ArrayList<Move> moves){
+
         int[][] offsets = {{1,0},{0,-1},{-1,0},{0,1},{1,1},{1,-1},{-1,-1},{-1,1}};
         for (int[] off : offsets) {
-            if(s.getRank()+off[0]<8 && s.getRank()+off[0]>=0 && s.getFile()+off[1]<8 && s.getFile()+off[1]>=0 && Chess.visualBoard[s.getRank()+off[0]][s.getFile()+off[1]].getPieceColor() != s.getPieceColor()){
+            if(s.getRank()+off[0]<8 && s.getRank()+off[0]>=0 && s.getFile()+off[1]<8 && s.getFile()+off[1]>=0 && (Chess.visualBoard[s.getRank()+off[0]][s.getFile()+off[1]].getPiece() == NONE || Chess.visualBoard[s.getRank()+off[0]][s.getFile()+off[1]].getPieceColor() != s.getPieceColor())){
 
                 moves.add(new Move(s,Chess.visualBoard[s.getRank()+off[0]][s.getFile()+off[1]]));
                 Chess.visualBoard[s.getRank()+off[0]][s.getFile()+off[1]].setProt(true);
             }
         }
+        
         
     }
 
@@ -220,7 +311,7 @@ public class Piece extends JPanel{
             int[][] offsets = {{1,0},{0,-1},{-1,0},{0,1},{1,1},{1,-1},{-1,-1},{-1,1}};
             int[] spaces = getSquaresToEdge(s);
             int startIndex = s.getPiece()==BISHOP?4:0;
-            int endIndex = s.getPiece()==ROOK?5:8;
+            int endIndex = s.getPiece()==ROOK?4:8;
             for(int direction = startIndex; direction<endIndex;direction++){
                     if(spaces[direction]!=0){
                         for(int i = 0;i<spaces[direction];i++){
@@ -240,10 +331,10 @@ public class Piece extends JPanel{
         moves = new ArrayList<Move>();
         
         for(Square[] r : Chess.visualBoard){
-            for(Square p:r ){
+            for(Square p : r){
                 if(p.getPieceColor() == Chess.gameTurn){
                     int pieceVal = p.getPiece();
-                    if(p.getPiece() == Piece.PAWN){
+                    if(pieceVal == Piece.PAWN){
                         generatePawnMoves(p, moves);
                     }else if(pieceVal == Piece.BISHOP || pieceVal == Piece.QUEEN || pieceVal == Piece.ROOK){
                         generateLongMoves(p,moves);
@@ -258,7 +349,40 @@ public class Piece extends JPanel{
         return moves;
     }
 
+    public static ArrayList<Square> generateAttackRays(){
+        ArrayList<Square> squares = new ArrayList<Square>();
+        for (Square[] r : Chess.visualBoard) {
+            for (Square s : r) {
+                if(s.getPieceColor() == Chess.gameTurn){
+                    int val = s.getPiece();
+                    switch(val){
+                        case NONE:break;
+                        case PAWN:
+                            castPawnRay(s, squares);
+                            break;
+                        case BISHOP:
+                            castBishopRay(s, squares);
+                            break;
+                        case KNIGHT:
+                            castKnightRay(s, squares);
+                            break;
+                        case ROOK:
+                            castRookRay(s, squares);
+                            break;
+                        case QUEEN:
+                            castQueenRay(s, squares);
+                            break;
+                        default:break;
+                    }
+                }
+            }
+        }
+        return squares;
+    }
+
     public static ArrayList<Move> filterMoves(){
+        Date date = new Date();
+        long milli = date.getTime();
         ArrayList<Move> notFiltered = generateMoves();
         ArrayList<Move> filtered = new ArrayList<Move>(notFiltered.size());
         for(Iterator<Move> iterator = notFiltered.iterator();iterator.hasNext();){
@@ -266,26 +390,20 @@ public class Piece extends JPanel{
             //System.out.println("IN MOVES: "+m.ori.getPiece()+" "+m.ori.getPieceColor()+" "+m.ori.getRank()+", "+m.ori.getFile()+"    "+m.des.getPiece()+" "+m.des.getPieceColor()+" "+m.des.getRank()+", "+m.des.getFile());
             Square.handleMove(m.ori,m.des);
             //System.out.println(Arrays.deepToString(Chess.visualBoard));
-            ArrayList<Move> responses = generateMoves();
-            
-            boolean canTake = false;
-            for(Move x : responses){
-                //System.out.println("RESPONSES "+x.ori.getPiece()+" "+x.ori.getPieceColor()+" "+x.ori.getRank()+", "+x.ori.getFile()+"    "+x.des.getPiece()+" "+x.des.getPieceColor()+" "+x.des.getRank()+", "+x.des.getFile());
-                canTake = false;
-                if(x.des.getPiece() == Piece.KING){
-                    canTake = true;
-                    //System.out.println("SNIPPING "+m.ori.getPiece()+" "+m.ori.getPieceColor()+" "+m.ori.getRank()+", "+m.ori.getFile()+"    "+m.des.getPiece()+" "+m.des.getPieceColor()+" "+m.des.getRank()+", "+m.des.getFile());
-                    //System.out.println("DUE TO "+x.ori.getPiece()+" "+x.ori.getPieceColor()+" "+x.ori.getRank()+", "+x.ori.getFile()+"    "+x.des.getPiece()+" "+x.des.getPieceColor()+" "+x.des.getRank()+", "+x.des.getFile());
-                    break;
-                }
-            }
-            Square.unmakeMove();
-            if(!canTake){
+            ArrayList<Square> attacked  = generateAttackRays();
+            if(!attacked.contains(Chess.gameTurn==PIECE_BLACK?Chess.whiteKing:Chess.blackKing)){  
+                Square.unmakeMove();        
                 filtered.add(new Move(Chess.visualBoard[m.ori.getRank()][m.ori.getFile()], Chess.visualBoard[m.des.getRank()][m.des.getFile()]));
+            }else{
+                Square.unmakeMove();
             }
+            
         }
         Chess.board.revalidate();
         Chess.board.repaint();
+        System.out.println(Chess.whitePieces.size());
+        date = new Date();
+        System.out.println(date.getTime() - milli);
         return filtered;
     }
 //UP RIGHT DOWN LEFT LEFT_UP RIGHT_UP RIGHT_DOWN LEFT_DOWN

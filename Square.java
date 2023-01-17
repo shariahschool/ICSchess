@@ -20,6 +20,7 @@ public class Square extends JPanel implements MouseInputListener{
 
     public boolean highlightedSquare = false;
     public static Square lastSelected = null;
+    public boolean isPinned = false;
     
 
     public Square(int x, int y, int piece, int pieceColor, boolean white){
@@ -150,6 +151,10 @@ public class Square extends JPanel implements MouseInputListener{
 
     public static void handleMove(Square des){
             Square ori = lastSelected;
+            Chess.moveHistory.add(new Move(ori,des));
+            Chess.internalBoard[ori.getRank()][ori.getFile()] = Piece.NONE;
+            Chess.internalBoard[des.getRank()][des.getFile()] = ori.getPiece();
+
             if(ori.getPiece() == Piece.KING){
                 if(ori.getPieceColor() == Piece.PIECE_BLACK){
                     Chess.blackKing = des;
@@ -157,10 +162,7 @@ public class Square extends JPanel implements MouseInputListener{
                     Chess.whiteKing = des;
                 }
             }
-            Chess.moveHistory.add(new Move(ori,des));
-            Chess.internalBoard[ori.getRank()][ori.getFile()] = Piece.NONE;
-            Chess.internalBoard[des.getRank()][des.getFile()] = ori.getPiece();
-
+            
             
             des.setPiece(ori.getPiece());
             des.setPieceColor(ori.getPieceColor());
@@ -183,7 +185,13 @@ public class Square extends JPanel implements MouseInputListener{
         Chess.internalBoard[ori.getRank()][ori.getFile()] = Piece.NONE;
         Chess.internalBoard[des.getRank()][des.getFile()] = ori.getPiece();
 
-        
+        if(ori.getPiece() == Piece.KING){
+            if(ori.getPieceColor() == Piece.PIECE_BLACK){
+                Chess.blackKing = des;
+            }else{
+                Chess.whiteKing = des;
+            }
+        }
         
         des.setPiece(ori.getPiece());
         des.setPieceColor(ori.getPieceColor());
@@ -207,6 +215,15 @@ public class Square extends JPanel implements MouseInputListener{
 
             Square newDes = Chess.visualBoard[m.des.getRank()][m.des.getFile()];
             Square newOri = Chess.visualBoard[m.ori.getRank()][m.ori.getFile()];
+
+            if(newDes.getPiece() == Piece.KING){
+                if(newDes.getPieceColor() == Piece.PIECE_BLACK){
+                    Chess.blackKing = newOri;
+                }else{
+                    Chess.whiteKing = newOri;
+                }
+            }
+
             Chess.internalBoard[newOri.getRank()][newOri.getFile()] = m.ori.getPiece();
             Chess.internalBoard[newDes.getRank()][newDes.getFile()] = m.des.getPiece();
             newDes.setPiece(m.des.getPiece());
@@ -226,8 +243,10 @@ public class Square extends JPanel implements MouseInputListener{
 
     @Override
     public void mouseClicked(MouseEvent e) {
-        if(this.highlightedSquare){
+
+        if(this.highlightedSquare){   
             handleMove(this);
+            lastSelected.setWhiteSquare(lastSelected.isWhiteSquare());
             Piece.moves = Piece.filterMoves();
             if(Piece.moves.size() == 0){
                 System.out.println("CHECKMATE, "+(Chess.gameTurn==Piece.PIECE_BLACK?"White King Wins!":"Black King Wins!"));
@@ -242,8 +261,12 @@ public class Square extends JPanel implements MouseInputListener{
 
             unhighlightAll();
             //System.out.println("Fired");
+            if(lastSelected!=null){
+                lastSelected.setWhiteSquare(lastSelected.isWhiteSquare());
+            }
             if(this.piece != Piece.NONE && this.pieceColor == Chess.gameTurn){
                 lastSelected = this;
+                this.setBackground(Color.green);
 
                 ArrayList<Move> moves = new ArrayList<Move>();
                 for (Move move : Piece.moves){
