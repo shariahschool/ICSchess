@@ -394,6 +394,40 @@ public class Piece extends JPanel{
         return squares;
     }
 
+    public static ArrayList<Square> generateAttackRays(boolean otherPlayer){
+        ArrayList<Square> squares = new ArrayList<Square>();
+        for (Square[] r : Chess.visualBoard) {
+            for (Square s : r) {
+                if(s.getPieceColor() != Chess.gameTurn){
+                    int val = s.getPiece();
+                    switch(val){
+                        case NONE:break;
+                        case PAWN:
+                            castPawnRay(s, squares);
+                            break;
+                        case BISHOP:
+                            castBishopRay(s, squares);
+                            break;
+                        case KNIGHT:
+                            castKnightRay(s, squares);
+                            break;
+                        case ROOK:
+                            castRookRay(s, squares);
+                            break;
+                        case QUEEN:
+                            castQueenRay(s, squares);
+                            break;
+                        case KING:
+                            castKingRay(s, squares);
+                            break;
+                        default:break;
+                    }
+                }
+            }
+        }
+        return squares;
+    }
+
     public static ArrayList<Move> filterMoves(){
         Date date = new Date();
         long milli = date.getTime();

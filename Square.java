@@ -147,12 +147,22 @@ public class Square extends JPanel implements MouseInputListener{
             i.remove();
         }
     }
-
+    public static void promote(Square des){
+        Square ori = lastSelected;
+        Promotion p = new Promotion(ori,des);
+        Chess.setGlassPane(p);
+        Chess.glassPane.setVisible(true);
+    }
     public static void handleMove(Square des){
             Square ori = lastSelected;
             Chess.moveHistory.add(new Move(ori,des));
+
+
+
             Chess.internalBoard[ori.getRank()][ori.getFile()] = Piece.NONE;
             Chess.internalBoard[des.getRank()][des.getFile()] = ori.getPiece();
+
+
 
             if(ori.getPiece() == Piece.KING){
                 if(ori.getPieceColor() == Piece.PIECE_BLACK){
@@ -174,6 +184,20 @@ public class Square extends JPanel implements MouseInputListener{
             
 
             Chess.gameTurn = Chess.gameTurn==Piece.PIECE_WHITE?Piece.PIECE_BLACK:Piece.PIECE_WHITE;
+
+            lastSelected.setWhiteSquare(lastSelected.isWhiteSquare());
+            Piece.moves = Piece.filterMoves();
+            if(Piece.moves.size() == 0){
+                ArrayList<Square> attacks = Piece.generateAttackRays(true);
+                if(attacks.contains(Chess.gameTurn==Piece.PIECE_BLACK?Chess.blackKing:Chess.whiteKing)){
+                    System.out.println("CHECKMATE, "+(Chess.gameTurn==Piece.PIECE_BLACK?"White King Wins!":"Black King Wins!"));
+                }else{
+                    System.out.println("STALEMATE, DRAW");
+                }
+            }else{
+                Chess.updateAttacked();
+                Ai.aiMove();
+            }
             //System.out.println(Arrays.deepToString(Chess.internalBoard));
     }
 
@@ -244,19 +268,12 @@ public class Square extends JPanel implements MouseInputListener{
     public void mouseClicked(MouseEvent e) {
 
         if(this.highlightedSquare){   
-            handleMove(this);
-            lastSelected.setWhiteSquare(lastSelected.isWhiteSquare());
-            Piece.moves = Piece.filterMoves();
-            if(Piece.moves.size() == 0){
-                if(Piece.generateAttackRays().contains(Chess.gameTurn==Piece.PIECE_BLACK?Chess.blackKing:Chess.whiteKing)){
-                    System.out.println("CHECKMATE, "+(Chess.gameTurn==Piece.PIECE_BLACK?"White King Wins!":"Black King Wins!"));
-                }else{
-                    System.out.println("STALEMATE, DRAW");
-                }
+            if(lastSelected.getPiece() == Piece.PAWN && this.getRank() == 0){
+                promote(this);
             }else{
-                Chess.updateAttacked();
-                //Ai.aiMove();
+                handleMove(this);
             }
+
 
             
             unhighlightAll();

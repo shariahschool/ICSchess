@@ -5,6 +5,7 @@ public class Move {
     public final int NONE = 0;
     public final int CASTLE = 1;
     public final int EN_PASSANT = 2;
+    public final int PROMOTION = 3;
 
     public Move(Square ori, Square des){
         this.ori = new Square(ori.getRank(), ori.getFile(), ori.getPiece(), ori.getPieceColor(), ori.isWhiteSquare());

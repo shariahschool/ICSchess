@@ -1,5 +1,9 @@
 import java.awt.*;
 import javax.swing.*;
+import javax.swing.event.MouseInputAdapter;
+
+import org.w3c.dom.events.MouseEvent;
+
 import java.util.ArrayList;
 
 public class Chess{
@@ -9,6 +13,9 @@ public class Chess{
     static ArrayList<Square> attackedBoard = new ArrayList<Square>();
     static ArrayList<Move> moveHistory = new ArrayList<Move>();
     static int gameTurn = Piece.PIECE_WHITE;
+    static JPanel glassPane = (JPanel)board.getGlassPane();
+
+    
 
     static ArrayList<Square> whitePieces = new ArrayList<Square>();
     static ArrayList<Square> blackPieces = new ArrayList<Square>();
@@ -160,7 +167,13 @@ public class Chess{
             
     }
 
+    public static void setGlassPane(JPanel p){
+        board.setGlassPane(p);
+        glassPane = p;
+    }
+
     public static void main(String[] args) {
+
 
         JPanel visuals = new JPanel();
         visuals.setBackground(Color.gray);
@@ -179,12 +192,13 @@ public class Chess{
 
         visuals.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
         visuals.setLayout(new GridLayout(8,8));
+        visuals.setMaximumSize(new Dimension(800,800));
         loadFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR");
         updateAttacked();
         Piece.moves = Piece.filterMoves();
-
+        
+        glassPane.setLayout(new BorderLayout());
         board.setSize(800, 800);
-        board.setMaximumSize(new Dimension(90,90));
         board.add(visuals);
         board.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         board.pack();
