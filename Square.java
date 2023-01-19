@@ -190,9 +190,11 @@ public class Square extends JPanel implements MouseInputListener{
             if(Piece.moves.size() == 0){
                 ArrayList<Square> attacks = Piece.generateAttackRays(true);
                 if(attacks.contains(Chess.gameTurn==Piece.PIECE_BLACK?Chess.blackKing:Chess.whiteKing)){
+                    Chess.setGlassPane(new EndScreen("<html>CHECKMATE<br>"+(Chess.gameTurn==Piece.PIECE_WHITE?"WHITE WINS</html>":"BLACK WINS</html>")));
+                    Chess.glassPane.setVisible(true);
                     System.out.println("CHECKMATE, "+(Chess.gameTurn==Piece.PIECE_BLACK?"White King Wins!":"Black King Wins!"));
                 }else{
-                    System.out.println("STALEMATE, DRAW");
+                    System.out.println("<html>DRAW<br>STALEMATE</html>");
                 }
             }else{
                 Chess.updateAttacked();

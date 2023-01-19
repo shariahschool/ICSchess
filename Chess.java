@@ -193,7 +193,7 @@ public class Chess{
         visuals.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
         visuals.setLayout(new GridLayout(8,8));
         visuals.setMaximumSize(new Dimension(800,800));
-        loadFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR");
+        loadFen("rnbqkbnr/pppppppp/8/8/2B1P3/5Q2/PPPP1PPP/RNB1K1NR");
         updateAttacked();
         Piece.moves = Piece.filterMoves();
         
