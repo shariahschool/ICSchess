@@ -7,6 +7,7 @@ import org.w3c.dom.events.MouseEvent;
 import java.util.ArrayList;
 
 public class Chess{
+    public static final String START_FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
     static JFrame board = new JFrame("Chess");
     static Square[][] visualBoard = new Square[8][8];
     static int[][] internalBoard = new int[8][8];
