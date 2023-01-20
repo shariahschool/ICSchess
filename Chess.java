@@ -177,6 +177,8 @@ public class Chess{
 
 
         JPanel visuals = new JPanel();
+        Chess.setGlassPane(new StartScreen());
+        board.getGlassPane().setVisible(true);
         visuals.setBackground(Color.gray);
         
         for(int rank = 0; rank<8; rank++){
@@ -188,7 +190,6 @@ public class Chess{
             }
 
         }
-
 
 
         visuals.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
