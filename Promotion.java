@@ -33,30 +33,68 @@ public class Promotion extends JPanel implements MouseInputListener{
         this.setLayout(new GridLayout(8,8));
         this.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
         int sFile = d.getFile();
-        for(int rank = 0; rank<8; rank++){
-            for(int file = 0; file<8; file++){
-                System.out.println("HI "+rank+" "+file);
-                if(file == sFile){
-                    switch(rank){
-                        case 0:
-                            this.add(queenBut);
-                            break;
-                        case 1:
-                            this.add(rookBut);
-                            break;
-                        case 2:
-                            this.add(bishopBut);
-                            break;
-                        case 3:
-                            this.add(knightBut);
-                            break;
-                        default: break;
-                            
+        if(Chess.gameTurn == Piece.PIECE_WHITE){
+            for(int rank = 0; rank<8; rank++){
+                for(int file = 0; file<8; file++){
+                    System.out.println("HI "+rank+" "+file);
+                    if(file == sFile){
+                        switch(rank){
+                            case 0:
+                                this.add(queenBut);
+                                break;
+                            case 1:
+                                this.add(rookBut);
+                                break;
+                            case 2:
+                                this.add(bishopBut);
+                                break;
+                            case 3:
+                                this.add(knightBut);
+                                break;
+                            default:
+                                JPanel filler = new JPanel();
+                                filler.setVisible(false);
+                                this.add(filler);
+                                break;
+                                
+                        }
+                    }else{
+                        JPanel filler = new JPanel();
+                        filler.setVisible(false);
+                        this.add(filler);
                     }
-                }else{
-                    JPanel filler = new JPanel();
-                    filler.setVisible(false);
-                    this.add(filler);
+                }
+            }
+        }else{
+            for(int rank = 0; rank<8; rank++){
+                for(int file = 0; file<8; file++){
+                    System.out.println("HI "+rank+" "+file);
+                    if(file == sFile){
+                        switch(rank){
+                            case 7:
+                                this.add(queenBut);
+                                break;
+                            case 6:
+                                this.add(rookBut);
+                                break;
+                            case 5:
+                                this.add(bishopBut);
+                                break;
+                            case 4:
+                                this.add(knightBut);
+                                break;
+                            default:
+                                JPanel filler = new JPanel();
+                                filler.setVisible(false);
+                                this.add(filler);
+                                break;
+                                
+                        }
+                    }else{
+                        JPanel filler = new JPanel();
+                        filler.setVisible(false);
+                        this.add(filler);
+                    }
                 }
             }
         }

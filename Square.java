@@ -273,6 +273,8 @@ public class Square extends JPanel implements MouseInputListener{
         if(this.highlightedSquare){   
             if(lastSelected.getPiece() == Piece.PAWN && this.getRank() == 0){
                 promote(this);
+            }else if(lastSelected.getPiece() == Piece.PAWN && this.getRank() == 7){
+                promote(this);
             }else{
                 handleMove(this);
             }

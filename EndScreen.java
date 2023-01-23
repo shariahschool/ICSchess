@@ -5,10 +5,14 @@ import java.awt.event.ActionEvent;
 
 import java.awt.*;
 import java.awt.event.MouseEvent;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 
 
 public class EndScreen extends JPanel implements MouseInputListener{
     JLabel button = new JLabel("New Game");
+    JLabel button2 = new JLabel("Load Position");
     public EndScreen(String status, String winner){
         super();
         addMouseListener(this);
@@ -51,6 +55,10 @@ public class EndScreen extends JPanel implements MouseInputListener{
         mainPanel.add(label);
         mainPanel.add(label2);
         mainPanel.add(Box.createVerticalGlue());
+        mainPanel.add(Box.createVerticalGlue());
+        mainPanel.add(Box.createVerticalGlue());
+        mainPanel.add(Box.createVerticalGlue());
+        mainPanel.add(Box.createVerticalGlue());
         
         button.setSize(new Dimension(300,200));
         button.setForeground(Color.white);
@@ -60,6 +68,17 @@ public class EndScreen extends JPanel implements MouseInputListener{
         button.setAlignmentX(CENTER_ALIGNMENT);
         button.addMouseListener(this);
         mainPanel.add(button);
+
+        mainPanel.add(Box.createVerticalGlue());
+
+        button2.setSize(new Dimension(300,200));
+        button2.setForeground(Color.white);
+        button2.setBackground(Color.decode("#534138"));
+        button2.setOpaque(true);
+        button2.setFont(new Font("Verdana", Font.BOLD,36));
+        button2.setAlignmentX(CENTER_ALIGNMENT);
+        button2.addMouseListener(this);
+        mainPanel.add(button2);
 
         this.add(fillerx, BorderLayout.WEST);
         this.add(fillery, BorderLayout.NORTH);
@@ -82,7 +101,28 @@ public class EndScreen extends JPanel implements MouseInputListener{
             Chess.gameTurn = Piece.PIECE_WHITE;
             Piece.moves = Piece.filterMoves();
             this.setVisible(false);
-        }else{
+        }else if(e.getSource() == button2){
+            FileDialog fd = new FileDialog(Chess.board, "Choose a FEN file", FileDialog.LOAD);
+            fd.setDirectory("FEN");
+            fd.setFile("*.txt");
+            fd.setVisible(true);
+            String filename = fd.getFile();
+            if (filename == null){
+                e.consume();
+            }
+            else{
+                try{
+                String loadedString = new String(Files.readAllBytes(new File(fd.getDirectory().concat(filename)).toPath()));
+                Chess.loadFen(loadedString);
+                Chess.gameTurn = Piece.PIECE_WHITE;
+                Piece.moves = Piece.filterMoves();
+                this.setVisible(false);
+                }catch(IOException err){
+                    System.err.println("Can't find file");
+                }
+            }
+        }
+        else{
             e.consume();
         }
         

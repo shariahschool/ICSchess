@@ -1,10 +1,16 @@
 import java.awt.*;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+
 import javax.swing.*;
 import javax.swing.event.MouseInputAdapter;
 
 import org.w3c.dom.events.MouseEvent;
 
 import java.util.ArrayList;
+
+import java.util.Random;
 
 public class Chess{
     public static final String START_FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
@@ -195,11 +201,20 @@ public class Chess{
         visuals.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
         visuals.setLayout(new GridLayout(8,8));
         visuals.setMaximumSize(new Dimension(800,800));
-        loadFen("rnbqkbnr/pppppppp/8/8/2B1P3/5Q2/PPPP1PPP/RNB1K1NR");
+        Random rand = new Random();
+        File[] pos = new File("FEN").listFiles();
+        try{
+            String loadedString = new String(Files.readAllBytes(pos[rand.nextInt(pos.length)].toPath()));
+            loadFen(loadedString);
+        }catch(IOException err){
+            System.out.println("couldn't load random position");
+            loadFen(START_FEN);
+        }
+
         updateAttacked();
         Piece.moves = Piece.filterMoves();
         
-        glassPane.setLayout(new BorderLayout());
+
         board.setSize(800, 800);
         board.add(visuals);
         board.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
